@@ -1,1 +1,1 @@
-# firebase_func_master
+# firebase function
