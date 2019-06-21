@@ -60,3 +60,9 @@ exports.addNotification = functions.database.ref('/notification/{uid}/{nid}/{nti
             })
         })
 })
+exports.newuser = functions.database.ref('/users/{uid}/devicetoken').onCreate(event=>{
+        const {uid} = event.params;
+        const nid = event.data.val();
+        console.log(`new user ${uid}:${nid}`);
+        return admin.database().ref('/notification/'+uid+'/'+nid).child(Date.now()).set({type:'welcome',text:'Welcome!'})
+})
