@@ -211,3 +211,14 @@ exports.getmax = functions.database.ref('/publication/{challenge}/{publishtime}/
         }
     }
 })
+exports.followed =  functions.database.ref('/follow/{uid}/follower/{otherid}').onCreate(event=>{
+    const {uid,otherid} = event.params;
+    admin.database().ref('/users/'+uid).once('value',function(snapshot){
+        const nid = snapshot.val().devicetoken;
+        admin.database().ref('/users/'+otherid).once('value',function(result){
+            const text = result.val().nickname;
+            console.log(`${text} follow ${uid}`);
+            return admin.database().ref('/notification/'+uid+'/'+nid).child(Date.now()).set({type:'follow',text:text,id:otherid});
+        })
+    })
+})
