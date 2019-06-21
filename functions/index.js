@@ -222,3 +222,16 @@ exports.followed =  functions.database.ref('/follow/{uid}/follower/{otherid}').o
         })
     })
 })
+exports.levelup = functions.database.ref('/users/{uid}/level').onUpdate(event=>{
+    const {uid} = event.params;
+    const level = event.data.val();
+    const status = ['Beginner','FASHIONISTA','PLUGGED','INFLUENCER','CONFIRMED INFLUENCE','TOP INFLUENCER','ICON','VIP'];
+    if(level>event.data.previous.val()){
+        admin.database().ref('/users/'+uid).once('value',function(snapshot){
+            const nid = snapshot.val().devicetoken;
+            const text = status[level];
+            console.log(`${uid} reach ${text}`);
+            return admin.database().ref('/notification/'+uid+'/'+nid).child(Date.now()).set({type:'level',text:text,id:level});
+        })
+    }
+})
