@@ -235,3 +235,20 @@ exports.levelup = functions.database.ref('/users/{uid}/level').onUpdate(event=>{
         })
     }
 })
+exports.levelchange = functions.database.ref('users/{uid}/points').onUpdate(event=>{
+    const {uid} = event.params;
+    const points = event.data.val();
+    const pointarray = [{point:1000},{point:5000},{point:15000},{point:50000},{point:100000},{point:200000},{point:350000},{point:500000}];
+    admin.database().ref('users/'+uid).once('value',function(snapshot){
+        let level = snapshot.val().level;
+        if(points>event.data.previous.val()){
+            if(points>=pointarray[level].point){
+                admin.database().ref('/users/'+ uid).child('level').set(level+1);
+            }
+        }else{
+            if(level>0 && points<pointarray[level-1].point){
+                admin.database().ref('/users/'+ uid).child('level').set(level-1);
+            }
+        }
+    })
+})
